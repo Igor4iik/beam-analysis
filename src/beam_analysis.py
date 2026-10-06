@@ -33,13 +33,11 @@ def draw(L):
         trt.teleport(x1*zoom,y1*zoom)
         #print("x1= ",x1,"y1= ",y1)
         
-        trt.forward(l*zoom)
-        trt.left(90)
-        trt.forward(h*zoom)
-        trt.left(90)
-        trt.forward(l*zoom)
-        trt.left(90)
-        trt.forward(h*zoom)
+        for i in range(2):
+            trt.forward(l*zoom)
+            trt.left(90)
+            trt.forward(h*zoom)
+            trt.left(90)
     trt.end_fill()
         
 draw(L)
