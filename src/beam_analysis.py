@@ -1,4 +1,6 @@
-import turtle as trt
+#import turtle as trt
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpath
 
 #L = [[x1,y1,x2,y2],[x1,y1,x2,y2]]
 L = [[0,0,6,2],[2,2,4,6],[0,6,6,8]]
@@ -17,12 +19,8 @@ def cdg_mini(x1,y1,x2,y2):
     return xg, yg
 
 def draw(L):
-    trt.color("black", "orange")
-    trt.begin_fill()
-    zoom = 10
+    fig, ax = plt.subplots()
     for i in range(len(L)):
-        trt.setheading(0)
-        
         x1 = L[i][0]
         y1 = L[i][1]
         x2 = L[i][2]
@@ -30,15 +28,10 @@ def draw(L):
         
         l = abs(x2-x1)
         h = abs(y2-y1)
-        trt.teleport(x1*zoom,y1*zoom)
-        #print("x1= ",x1,"y1= ",y1)
         
-        for i in range(2):
-            trt.forward(l*zoom)
-            trt.left(90)
-            trt.forward(h*zoom)
-            trt.left(90)
-    trt.end_fill()
+        rect = mpath.Rectangle((x1, y1), l, h, edgecolor = 'black', linewidth = 1.5)
+        ax.add_patch(rect)
+    plt.show()
         
 draw(L)
 
@@ -90,3 +83,8 @@ Igx_tot, Igy_tot = moment_quadratique_tot(L)
 print("le moment quadratique est: Igx= ", Igx_tot, " Igy= " ,Igy_tot)
 
 
+
+    
+    
+    
+    
