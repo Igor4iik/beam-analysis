@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpath
 import numpy as np
 
+figure1, ax1 = plt.subplots()
+figure2, ax2 = plt.subplots(3,1)
+
 #L = [[x1,y1,x2,y2],[x1,y1,x2,y2]]
 L = [[0,0,6,2],[2,2,4,6],[0,6,6,8]]
 print(L)
@@ -18,7 +21,6 @@ def cdg_mini(x1,y1,x2,y2):
     return xg, yg
 
 def draw(L):
-    fig, ax = plt.subplots()
     for i in range(len(L)):
         x1 = L[i][0]
         y1 = L[i][1]
@@ -29,8 +31,10 @@ def draw(L):
         h = abs(y2-y1)
         
         rect = mpath.Rectangle((x1, y1), l, h, edgecolor = 'black', linewidth = 1.5)
-        ax.add_patch(rect)
-    plt.show()
+        ax1.add_patch(rect)
+        ax1.set_aspect('equal')
+        ax1.autoscale_view()
+    #plt.show()
         
 draw(L)
 
@@ -118,6 +122,8 @@ Fx, Fy, L = acquisition()
 def Mf(Fy, L):
     B_len = np.linspace(0,L,100)
     Mf = np.zeros(len(B_len))
+    
+    """
     #on trie Fy en fonction de la distance
     F = []
     while len(Fy) != 0:
@@ -126,21 +132,49 @@ def Mf(Fy, L):
             if Fy[i][1] < Fy[i_mini][1]:
                 i_mini = i
         F.append(Fy.pop(i_mini))
-        
+    """
+    
     #on caclule Mf   
     for i in range(len(Mf)):
         m = 0    
-        for force in F:
+        for force in Fy:
             if force[1] < B_len[i]:
                 m = m + force[0]*(B_len[i] - force[1])
         Mf[i] = m
                 
-    print(F)
-    print(Mf)
+    #print(F)
+    #print(Mf)
     return Mf, B_len
 
-Mf, B_len = Mf([ [10.0, 0.0], [-20.0, 5.0], [10.0, 10.0]], 10)
+def Ty(Fy, L):
+    B_len = np.linspace(0,L,100)
+    Ty = np.zeros(len(B_len))
+    for i in range(len(Ty)):
+        f = 0    
+        for force in Fy:
+            if force[1] <= B_len[i]:
+                f = f + force[0]
+        Ty[i] = f
+    return Ty
+
+def Tx(Fx, L):
+    B_len = np.linspace(0,L,100)
+    Tx = np.zeros(len(B_len))
+    for i in range(len(Tx)):
+        f = 0    
+        for force in Fx:
+            if force[1] <= B_len[i]:
+                f = f + force[0]
+        Tx[i] = f
+    return Tx
 
 
-plt.plot(B_len, Mf)
+Mf, B_len = Mf([[10.0, 0.0], [-20.0, 5.0], [10.0, 10.0]], 10)
+Ty = Ty([[10.0, 0.0], [-20.0, 5.0], [10.0, 10.0]], 10)
+Tx = Tx([[-20.0, 0.0], [10.0, 5.0], [10.0, 10.0]], 10)
+
+ax2[0].plot(B_len, Mf)
+ax2[1].plot(B_len, Ty)
+ax2[2].plot(B_len, Tx)
+
 plt.show()
