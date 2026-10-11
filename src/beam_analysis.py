@@ -33,14 +33,34 @@ def draw(Rect, L, Fx, Fy):
         rect = mpath.Rectangle((x1, y1), l, h, edgecolor = 'black', linewidth = 1.5)
         ax1[0].add_patch(rect)
         
-        rect_vc = mpath.Rectangle((0, y1), L, h, edgecolor = 'black', linewidth = 1.5)
-        ax1[1].add_patch(rect_vc)
+    ax1[1].plot([0,L], [0,0], linewidth = 4)
+    
+    Fx_max = abs(Fx[0][0])
+    for force in Fx:
+        if abs(force[0]) > Fx_max:
+            Fx_max = abs(force[0])
+            
+    Fy_max = abs(Fy[0][0])
+    for force in Fy:
+        if abs(force[0]) > Fy_max:
+            Fy_max = abs(force[0])
+            
+    scale = 2
+
+    for force in Fx:
+        ax1[1].annotate(f"{force[0]}N", xy = (force[1],0), xytext= (force[1] - scale*( force[0]/Fx_max),0), arrowprops = dict(facecolor='red'))
+    for force in Fy:
+        ax1[1].annotate(f"{force[0]}N", xy = (force[1],0), xytext= (force[1], -1*scale*(force[0]/Fy_max)), arrowprops = dict(facecolor='red')) 
+        
     
     ax1[0].set_aspect('equal')
     ax1[0].autoscale_view()
     
-    ax1[1].set_aspect('equal')
+    ax1[1].set_xlim(-1, L + 1)
+    ax1[1].set_ylim(-2, 2)
     ax1[1].autoscale_view()
+    
+    
 
 def cdg(Rect):
     sum_cov_x = 0
@@ -86,6 +106,8 @@ def moment_quadratique_tot(Rect):
 Igx_tot, Igy_tot = moment_quadratique_tot(Rect)
 
 print("le moment quadratique est: Igx= ", Igx_tot, " Igy= " ,Igy_tot)
+
+
 
 
 #
@@ -175,7 +197,7 @@ Mf, B_len = Mf([[10.0, 0.0], [-20.0, 5.0], [10.0, 10.0]], 10)
 Ty = Ty([[10.0, 0.0], [-20.0, 5.0], [10.0, 10.0]], 10)
 Tx = Tx([[-20.0, 0.0], [10.0, 5.0], [10.0, 10.0]], 10)
 
-draw(Rect, 10, Tx, Ty)
+draw(Rect, 10, [[-20.0, 0.0], [10.0, 5.0], [10.0, 10.0]], [[10.0, 0.0], [-20.0, 5.0], [10.0, 10.0]])
 
 figure2.subplots_adjust(hspace=0.8)
 
