@@ -1,13 +1,18 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpath
 import numpy as np
+from scipy import integrate
 
-figure1, ax1 = plt.subplots(2,1)
+figure1, ax1 = plt.subplots(3,1)
 figure2, ax2 = plt.subplots(3,1)
 
 #L = [[x1,y1,x2,y2],[x1,y1,x2,y2]]
 Rect = [[0,0,6,2],[2,2,4,6],[0,6,6,8]]
 print(Rect)
+E = 100 #le module de Young
+L = 10 #longueure de la poutre
+Fy = [[10.0, 0.0], [-20.0, 5.0], [10.0, 10.0]]
+Fx = [[-20.0, 0.0], [10.0, 5.0], [10.0, 10.0]]
 
 def surface(x1,y1,x2,y2):
     h = abs(y2-y1)
@@ -17,7 +22,6 @@ def surface(x1,y1,x2,y2):
 def cdg_mini(x1,y1,x2,y2):
     xg = x1 + abs(x1-x2)/2
     yg = y1 + abs(y1-y2)/2
-    #print("cdg intermediaire est: ",xg," ", yg )
     return xg, yg
 
 def draw(Rect, L, Fx, Fy):
@@ -108,8 +112,6 @@ Igx_tot, Igy_tot = moment_quadratique_tot(Rect)
 print("le moment quadratique est: Igx= ", Igx_tot, " Igy= " ,Igy_tot)
 
 
-
-
 #
 # Calculs N , T et Mf
 #
@@ -193,12 +195,35 @@ def Tx(Fx, L):
     return Tx
 
 
-Mf, B_len = Mf([[10.0, 0.0], [-20.0, 5.0], [10.0, 10.0]], 10)
-Ty = Ty([[10.0, 0.0], [-20.0, 5.0], [10.0, 10.0]], 10)
-Tx = Tx([[-20.0, 0.0], [10.0, 5.0], [10.0, 10.0]], 10)
+# Integration pour trouver la deformee
 
-draw(Rect, 10, [[-20.0, 0.0], [10.0, 5.0], [10.0, 10.0]], [[10.0, 0.0], [-20.0, 5.0], [10.0, 10.0]])
+def deformee(Mf, B_len, Moment_quadratique):
+    courbure = Mf/(E*Moment_quadratique)
+    #premiere integration
+    angles = integrate.cumulative_trapezoid(courbure, B_len, initial=0)
+    #deuxieme integration
+    y1 = integrate.cumulative_trapezoid(angles, B_len, initial=0)
+    
+    #trouvons les constantes
+    C2 = -y1[0]
+    C1 = (-y1[-1]-C2)/L
+    
+    #calcul final
+    y = np.zeros(len(Mf))
+    for i in range(len(y)):
+        y[i] = y1[i] + C1*B_len[i] + C2
+        
+    print(f"la deformee max est: {np.max(abs(y))} m ")
+    return y
 
+
+Mf, B_len = Mf(Fy, L)
+Ty = Ty(Fy, L)
+Tx = Tx(Fx, L)
+
+draw(Rect, L, Fx, Fy)
+
+figure1.subplots_adjust(hspace=0.8)
 figure2.subplots_adjust(hspace=0.8)
 
 ax2[0].set_title('Moment fléchissant')
@@ -219,5 +244,10 @@ ax2[2].set_xlabel('Position selon x (m)')
 ax2[2].set_ylabel('Tx (N)')
 ax2[2].stem(B_len, Tx, markerfmt="")
 ax2[2].plot(B_len, Tx)
+
+ax1[2].set_title('La deformee')
+ax1[2].set_xlabel('Position selon x (m)')
+ax1[2].set_ylabel('Deformation (m)')
+ax1[2].plot(B_len, deformee(Mf, B_len, Igx_tot))
 
 plt.show()
