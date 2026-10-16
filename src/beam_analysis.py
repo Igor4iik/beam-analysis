@@ -11,13 +11,13 @@ E = 200E9 # le module de Young ex: 200E9 Pa pour l'acier
 L = 10 # la longueur de la poutre en metres
 
 # La position des efforts extérieurs en newton sauf celle des supports
-# F = [[force 1, position 1],[force 2, position 2], ...]
-Fy = [[-20.0, 5.0], [-10.0, 2.0], [40.0, 8.0]]
-Fx = [[10.0, 5.0]]
+# F = [[force 1, position 1], [force 2, position 2], ...]
+Fy = [[-200.0, 5.0]]
+Fx = []
 
 # La position et le type des supports
 # attention, le système doit rester isostatique
-Pos_supp = [[1,'pin'], [7,'roller']]
+Pos_supp = [[0,'pin'], [10,'roller']]
 
 
 
@@ -69,24 +69,28 @@ def Rect_draw(Rect):
 
 def Arrow_draw(L, Fx, Fy, color = 'red'):
     ax1[1].plot([0,L], [0,0], linewidth = 4)
-    
-    Fx_max = abs(Fx[0][0])
-    for force in Fx:
-        if abs(force[0]) > Fx_max:
-            Fx_max = abs(force[0])
-            
-    Fy_max = abs(Fy[0][0])
-    for force in Fy:
-        if abs(force[0]) > Fy_max:
-            Fy_max = abs(force[0])
-            
     scale = 2
-
-    for force in Fx:
-        ax1[1].annotate(f"{force[0]}N", xy = (force[1],0), xytext= (force[1] - 1*( force[0]/Fx_max),0), arrowprops = dict(facecolor=color))
-    for force in Fy:
-        ax1[1].annotate(f"{force[0]}N", xy = (force[1],0), xytext= (force[1], -1*scale*(force[0]/Fy_max)), arrowprops = dict(facecolor=color)) 
-        
+    
+    if len(Fx) != 0:
+        Fx_max = abs(Fx[0][0])
+        for force in Fx:
+            if abs(force[0]) > Fx_max:
+                Fx_max = abs(force[0])
+                
+        if Fx_max != 0:
+            for force in Fx:
+                ax1[1].annotate(f"{round(force[0], 3)}N", xy = (force[1],0), xytext= (force[1] - 1*( force[0]/Fx_max),0), arrowprops = dict(facecolor=color))
+            
+    if len(Fy) != 0:
+        Fy_max = abs(Fy[0][0])
+        for force in Fy:
+            if abs(force[0]) > Fy_max:
+                Fy_max = abs(force[0])
+                
+        if Fy_max != 0:
+            for force in Fy:
+                ax1[1].annotate(f"{round(force[0], 3)}N", xy = (force[1],0), xytext= (force[1], -1*scale*(force[0]/Fy_max)), arrowprops = dict(facecolor=color))
+          
     
     ax1[0].set_aspect('equal')
     ax1[0].autoscale_view()
@@ -203,7 +207,7 @@ def shear_force(Fy, L):
         for force in Fy:
             if force[1] <= B_len[i]:
                 f = f + force[0]
-        Ty[i] = f
+        Ty[i] = -f 
     return Ty
 
 def normal_force(Fx, L):
@@ -214,7 +218,7 @@ def normal_force(Fx, L):
         for force in Fx:
             if force[1] <= B_len[i]:
                 f = f + force[0]
-        Tx[i] = f
+        Tx[i] = -f
     return Tx
 
 
@@ -250,10 +254,13 @@ def deformee(Mf, B_len, Moment_quadratique, Pos_supp, E):
 Arrow_draw(L, Fx, Fy, 'red')
 
 cdg_x, cdg_y = cdg(Rect)
-print(f"le centre de gravité est: x= {cdg_x}m, y= {cdg_y}m")
+print(f"le centre de gravité est: x= {round(cdg_x, 3)}m, y= {round(cdg_y, 3)}m")
 
 Igx_tot, Igy_tot = moment_quadratique_tot(Rect)
-print(f"le moment quadratique est: Igx= {round(Igx_tot, 3)}m^4, Igy= {round(Igy_tot, 3)}m^4")
+if Igx_tot > 0.001 or Igy_tot > 0.001:
+    print(f"le moment quadratique est: Igx= {round(Igx_tot, 6)}m^4, Igy= {round(Igy_tot, 6)}m^4")
+else:
+    print(f"le moment quadratique est: Igx= {round(Igx_tot*1E12, 6)}mm^4, Igy= {round(Igy_tot*1E12, 6)}mm^4")
 
 f1, f2, f3 = resSupport(Pos_supp, Fx, Fy)
 Fx.append(f1)
