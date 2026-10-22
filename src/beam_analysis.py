@@ -176,9 +176,19 @@ def resSupport(Pos_supp, Fx, Fy):
     F_support = np.linalg.solve(a, b)
     #print(F_support)
     
-    return [F_support[0], Pos_inconnu[0][0]], [F_support[1], Pos_inconnu[1][0]], [F_support[2], Pos_inconnu[2][0]]
-    
-    
+    Fx_support = []
+    Fy_support = []
+
+    for i in range(len(F_support)):
+        if Pos_inconnu[i][1] == 'Fx':
+            Fx_support.append([F_support[i], Pos_inconnu[i][0]])
+
+        elif Pos_inconnu[i][1] == 'Fy':
+            Fy_support.append([F_support[i], Pos_inconnu[i][0]])
+
+    return Fx_support, Fy_support
+
+
 #
 # Calculs N , T et Mf
 #
@@ -262,11 +272,10 @@ if Igx_tot > 0.001 or Igy_tot > 0.001:
 else:
     print(f"le moment quadratique est: Igx= {round(Igx_tot*1E12, 6)}mm^4, Igy= {round(Igy_tot*1E12, 6)}mm^4")
 
-f1, f2, f3 = resSupport(Pos_supp, Fx, Fy)
-Fx.append(f1)
-Fy.append(f2)
-Fy.append(f3)
-Arrow_draw(L, [f1], [f2, f3], 'blue')
+Fx_support, Fy_support = resSupport(Pos_supp, Fx, Fy)
+Fx.extend(Fx_support)
+Fy.extend(Fy_support)
+Arrow_draw(L, Fx_support, Fy_support, 'blue')
 
 Mf_values, B_len = bending_moment(Fy, L)
 Ty_values = shear_force(Fy, L)
