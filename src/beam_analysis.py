@@ -12,8 +12,8 @@ L = 10 # la longueur de la poutre en metres
 
 # La position des efforts extérieurs en newton sauf celle des supports
 # F = [[force 1, position 1], [force 2, position 2], ...]
-Fy = [[-200.0, 5.0]]
-Fx = []
+Fy = [[100.0, 3.0], [-150.0, 7.0]]
+Fx = [[10.0, 3.0]]
 
 # La position et le type des supports
 # attention, le système doit rester isostatique
@@ -90,19 +90,6 @@ def Arrow_draw(L, Fx, Fy, color = 'red'):
         if Fy_max != 0:
             for force in Fy:
                 ax1[1].annotate(f"{round(force[0], 3)}N", xy = (force[1],0), xytext= (force[1], -1*scale*(force[0]/Fy_max)), arrowprops = dict(facecolor=color))
-          
-    
-    ax1[0].set_aspect('equal')
-    ax1[0].autoscale_view()
-    ax1[0].set_title('La section')
-    ax1[0].set_xlabel('x (m)')
-    ax1[0].set_ylabel('y (m)')
-    
-    ax1[1].set_xlim(-1, L + 1)
-    ax1[1].set_ylim(-2, 2)
-    ax1[1].autoscale_view()
-    ax1[1].set_title('La position des efforts')
-    ax1[1].set_xlabel('x (m)')
     
 
 #
@@ -282,6 +269,22 @@ Ty_values = shear_force(Fy, L)
 Tx_values = normal_force(Fx, L)
 
 Rect_draw(Rect)
+
+x_min = -1
+x_max = L + 1
+ax1[1].set_xlim(x_min, x_max)
+ax1[2].set_xlim(x_min, x_max)
+
+ax1[0].set_aspect('equal')
+ax1[0].autoscale_view()
+ax1[0].set_title('La section')
+ax1[0].set_xlabel('x (m)')
+ax1[0].set_ylabel('y (m)')
+    
+ax1[1].set_ylim(-2, 2)
+ax1[1].autoscale_view()
+ax1[1].set_title('La position des efforts')
+ax1[1].set_xlabel('x (m)')
 
 figure1.subplots_adjust(hspace=0.8)
 figure2.subplots_adjust(hspace=0.8)
