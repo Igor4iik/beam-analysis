@@ -35,7 +35,7 @@ And visualize the section, applied forces, beam deformation, and internal force 
 # Rect = [[x1,y1,x2,y2],[x1,y1,x2,y2]]
 Rect = [[0,0,60,20],[20,20,40,60],[0,60,60,80]]
 ```
-<img width="298" height="260" alt="изображение" src="https://github.com/user-attachments/assets/7427609c-a89c-4b47-8be5-e58b0135c9a2" />
+<img width="298" height="260" alt="area-example" src="https://github.com/user-attachments/assets/7427609c-a89c-4b47-8be5-e58b0135c9a2" />
 
 - Young's modulus E = 200e9 Pa (steel)
 
